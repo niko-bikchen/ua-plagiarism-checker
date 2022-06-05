@@ -4,6 +4,7 @@ import hashlib
 
 import gdown
 
+from flask_cors import CORS
 from flask import Flask, request, send_from_directory, url_for, make_response
 from flask_pymongo import PyMongo
 from fastapi.encoders import jsonable_encoder
@@ -46,6 +47,8 @@ print(f"{datetime.utcnow()}: Setting-up Flask & PyMongo")
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+
+CORS(app)
 
 pymongo = PyMongo(app)
 
@@ -146,34 +149,10 @@ def delete_text(slug):
 
 @app.route("/texts/", methods=["GET"])
 def list_texts():
-    page = int(request.args.get("page", 1))
-    per_page = 10
-
-    cursor = ua_texts_collection.find({}).sort("title").skip(
-        per_page * (page - 1)).limit(per_page)
-
-    text_count = ua_texts_collection.count_documents({})
-
-    links = {
-        "self": {"href": url_for(".list_texts", page=page, _external=True)},
-        "last": {
-            "href": url_for(
-                ".list_texts", page=(text_count // per_page) + 1, _external=True
-            )
-        },
-    }
-    if page > 1:
-        links["prev"] = {
-            "href": url_for(".list_texts", page=page - 1, _external=True)
-        }
-    if page - 1 < text_count // per_page:
-        links["next"] = {
-            "href": url_for(".list_texts", page=page + 1, _external=True)
-        }
+    cursor = ua_texts_collection.find({}).sort("title")
 
     return {
-        "texts": [UaText(**doc).to_json() for doc in cursor],
-        "links": links,
+        "texts": [UaText(**doc).to_json() for doc in cursor]
     }
 
 
