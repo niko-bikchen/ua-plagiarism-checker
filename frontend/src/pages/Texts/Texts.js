@@ -20,14 +20,11 @@ import Divider from "@mui/material/Divider";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 
 import ViewFullTextModal from "../../components/ViewFullTextModal";
+import DeleteTextModal from "./components/DeleteTextModal";
 
 const TEXT_LEN_LIMIT = 500;
 
 const TextInstance = ({ title, text, viewFullText, slug, deleteText }) => {
-  const onTextDelete = useCallback(() => {
-    deleteText(slug);
-  }, [deleteText, slug]);
-
   return (
     <Box className="TextBlock">
       <Typography variant="h5" marginBottom="5px">
@@ -44,7 +41,7 @@ const TextInstance = ({ title, text, viewFullText, slug, deleteText }) => {
         </Button>
       </Typography>
       <Box textAlign="right">
-        <Button variant="contained" color="error" onClick={onTextDelete}>
+        <Button variant="contained" color="error" onClick={deleteText(slug)}>
           Delete
         </Button>
       </Box>
@@ -57,6 +54,11 @@ const Texts = () => {
     useContext(TextsContext);
   const { fetchingTexts, fetchTexts } = useTexts();
   const { modalIsOpen, openModal, closeModal } = useModalState();
+  const {
+    modalIsOpen: deleteModalIsOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModalState();
   const { isProcessing, addText, deleteText } = useManageTexts();
   const [textData, setTextData] = useState({ title: "", text: "", slug: "" });
 
@@ -65,6 +67,11 @@ const Texts = () => {
   const onTextsChange = useCallback(
     (newTexts) => changeTextsContext(setTexts(newTexts)),
     [changeTextsContext]
+  );
+
+  const onTextDelete = useCallback(
+    (slug) => () => deleteText(onTextsChange, slug),
+    [deleteText, onTextsChange]
   );
 
   const openModalWrapper = useCallback(
@@ -79,6 +86,19 @@ const Texts = () => {
     setTextData({ title: "", text: "" });
     closeModal();
   }, [closeModal]);
+
+  const openDeleteModalWrapper = useCallback(
+    (slug) => () => {
+      setTextData({ title: "", text: "", slug });
+      openDeleteModal();
+    },
+    [openDeleteModal]
+  );
+
+  const closeDeleteModalWrapper = useCallback(() => {
+    setTextData({ title: "", text: "", slug: "" });
+    closeDeleteModal();
+  }, [closeDeleteModal]);
 
   useEffect(() => {
     if (texts.length === 0) {
@@ -116,7 +136,7 @@ const Texts = () => {
             text={text.text}
             slug={text.slug}
             viewFullText={openModalWrapper}
-            deleteText={deleteText}
+            deleteText={openDeleteModalWrapper}
           />
         ))
       )}
@@ -125,6 +145,11 @@ const Texts = () => {
         title={textData.title}
         isOpen={modalIsOpen}
         onClose={closeModalWrapper}
+      />
+      <DeleteTextModal
+        isOpen={deleteModalIsOpen}
+        onClose={closeDeleteModalWrapper}
+        onDelete={onTextDelete(textData.slug)}
       />
     </Box>
   );

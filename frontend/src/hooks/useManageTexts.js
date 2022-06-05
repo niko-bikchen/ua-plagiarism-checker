@@ -15,9 +15,13 @@ const useTexts = () => {
       .finally(() => setIsProcessing(false));
   }, []);
 
-  const deleteText = useCallback((slug) => {
+  const deleteText = useCallback((setTexts, slug) => {
     setIsProcessing(true);
-    axios.delete(`/texts/${slug}`).finally(() => setIsProcessing(false));
+    axios
+      .delete(`/texts/${slug}`)
+      .then(() => axios.get("/texts/"))
+      .then((res) => setTexts([...res.data.texts]))
+      .finally(() => setIsProcessing(false));
   }, []);
 
   return { isProcessing, addText, deleteText };
