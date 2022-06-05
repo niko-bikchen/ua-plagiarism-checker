@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ModeStandbyIcon from "@mui/icons-material/ModeStandby";
@@ -25,9 +27,16 @@ const ResultInstance = ({ text, score, scoreLabel }) => (
 );
 
 const ComparisonResults = ({ results = {}, texts = [], isLoading }) => {
+  const [metric, setMetric] = useState("cosine_similarities");
+
   const target = useMemo(() => {
     return results.cosine_similarities?.target || "";
   }, [results]);
+
+  const onToggleChange = useCallback(
+    (_event, newValue) => setMetric(newValue),
+    []
+  );
 
   return (
     <Box
@@ -71,28 +80,52 @@ const ComparisonResults = ({ results = {}, texts = [], isLoading }) => {
               </Box>
               <Box
                 display="flex"
-                justifyContent="flex-start"
+                justifyContent="space-between"
                 alignItems="center"
-                gap={1}
               >
-                <Box className="TextLabel">
-                  <Typography variant="subtitle1" marginRight="5px">
-                    Results
-                  </Typography>
-                  <ListAltIcon />
+                <Box
+                  display="flex"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Box className="TextLabel">
+                    <Typography variant="subtitle1" marginRight="5px">
+                      Results ({results[metric].similar.length} documents)
+                    </Typography>
+                    <ListAltIcon />
+                  </Box>
+                  <Box className="TextLabel">
+                    <Typography variant="subtitle1" marginRight="5px">
+                      {metric === "cosine_similarities"
+                        ? "Cosine Similarities"
+                        : "Euclidian Distances"}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box className="TextLabel">
-                  <Typography variant="subtitle1" marginRight="5px">
-                    Cosine Similarities
-                  </Typography>
-                </Box>
+                <ToggleButtonGroup
+                  value={metric}
+                  exclusive
+                  onChange={onToggleChange}
+                >
+                  <ToggleButton value="cosine_similarities">
+                    Cosine Similarity
+                  </ToggleButton>
+                  <ToggleButton value="euclidian_distances">
+                    Euclidian Distance
+                  </ToggleButton>
+                </ToggleButtonGroup>
               </Box>
               <Box display="flex" flexDirection="column" gap="15px">
-                {results.cosine_similarities.similar.map(([slug, score]) => (
+                {results[metric].similar.map(([slug, score]) => (
                   <ResultInstance
                     score={score}
                     text={texts.find((item) => item.slug === slug)?.text}
-                    scoreLabel="Cosine Similarity"
+                    scoreLabel={
+                      metric === "cosine_similarities"
+                        ? "Cosine Similarity"
+                        : "Euclidian Distance"
+                    }
                   />
                 ))}
               </Box>

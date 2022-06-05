@@ -18,7 +18,17 @@ const useCompareTexts = () => {
       .finally(() => setIsComparing(false));
   }, []);
 
-  return { isComparing, comparisonResults, compareTexts };
+  const clearComparisonResults = useCallback(
+    () => setComparisonResults({}),
+    []
+  );
+
+  return {
+    isComparing,
+    comparisonResults,
+    clearComparisonResults,
+    compareTexts,
+  };
 };
 
 export default useCompareTexts;

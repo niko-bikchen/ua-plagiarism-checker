@@ -31,7 +31,12 @@ const MainPage = () => {
   const [inputValue, setInputValue] = useState("");
   const [model, setModel] = useState("word2vec");
 
-  const { isComparing, comparisonResults, compareTexts } = useCompareTexts();
+  const {
+    isComparing,
+    comparisonResults,
+    clearComparisonResults,
+    compareTexts,
+  } = useCompareTexts();
   const { fetchingTexts, fetchTexts } = useTexts();
 
   const texts = selectFromTextsContext(getTexts);
@@ -85,9 +90,6 @@ const MainPage = () => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="subtitle1" marginRight="5px">
-              Model To Use:
-            </Typography>
             {fetchingTexts ? (
               <Skeleton variant="rectangular" width={170} height={50} />
             ) : (
@@ -121,7 +123,7 @@ const MainPage = () => {
         <Stack
           direction="row"
           justifyContent="center"
-          spacing={2}
+          spacing={1}
           marginTop="15px"
         >
           <Button
@@ -130,6 +132,15 @@ const MainPage = () => {
             disabled={isComparing || fetchingTexts || inputValue.length === 0}
           >
             {isComparing ? "Comparing..." : "Submit"}
+          </Button>
+          <Button
+            disabled={
+              isComparing || Object.keys(comparisonResults).length === 0
+            }
+            variant="text"
+            onClick={clearComparisonResults}
+          >
+            Clear Results
           </Button>
         </Stack>
       </Box>
