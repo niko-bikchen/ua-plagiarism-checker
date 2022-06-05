@@ -1,5 +1,7 @@
 import React, { useMemo, useState, useCallback } from "react";
 
+import useModalState from "../../../../hooks/useModalState";
+
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 
@@ -7,14 +9,19 @@ import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import Button from "@mui/material/Button";
 
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ModeStandbyIcon from "@mui/icons-material/ModeStandby";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
+import ViewFullTextModal from "../../../../components/ViewFullTextModal";
+
 import "./ComparisonResults.css";
 
-const ResultInstance = ({ text, score, scoreLabel }) => (
+const TEXT_LEN_LIMIT = 500;
+
+const ResultInstance = ({ title, text, score, scoreLabel, viewFullText }) => (
   <Box className="TextBlock" display="flex" flexDirection="column">
     <Box marginBottom="10px" className="TextLabel">
       <Typography variant="subtitle2">
@@ -22,12 +29,23 @@ const ResultInstance = ({ text, score, scoreLabel }) => (
         {Math.round((parseFloat(score) + Number.EPSILON) * 100) / 100}
       </Typography>
     </Box>
-    <Typography>{text}</Typography>
+    <Typography variant="subtitle1" marginBottom="5px" fontWeight="bold">
+      {title}
+    </Typography>
+    <Typography>
+      {text.length > TEXT_LEN_LIMIT ? text.substring(0, TEXT_LEN_LIMIT) : text}
+      ...
+      <Button variant="text" onClick={viewFullText(title, text)}>
+        See Full
+      </Button>
+    </Typography>
   </Box>
 );
 
 const ComparisonResults = ({ results = {}, texts = [], isLoading }) => {
   const [metric, setMetric] = useState("cosine_similarities");
+  const [textData, setTextData] = useState({ title: "", text: "" });
+  const { modalIsOpen, openModal, closeModal } = useModalState();
 
   const target = useMemo(() => {
     return results.cosine_similarities?.target || "";
@@ -37,6 +55,19 @@ const ComparisonResults = ({ results = {}, texts = [], isLoading }) => {
     (_event, newValue) => setMetric(newValue),
     []
   );
+
+  const openModalWrapper = useCallback(
+    (title, text) => () => {
+      setTextData({ title, text });
+      openModal();
+    },
+    [openModal]
+  );
+
+  const closeModalWrapper = useCallback(() => {
+    setTextData({ title: "", text: "" });
+    closeModal();
+  }, [closeModal]);
 
   return (
     <Box
@@ -117,20 +148,31 @@ const ComparisonResults = ({ results = {}, texts = [], isLoading }) => {
                 </ToggleButtonGroup>
               </Box>
               <Box display="flex" flexDirection="column" gap="15px">
-                {results[metric].similar.map(([slug, score]) => (
-                  <ResultInstance
-                    score={score}
-                    text={texts.find((item) => item.slug === slug)?.text}
-                    scoreLabel={
-                      metric === "cosine_similarities"
-                        ? "Cosine Similarity"
-                        : "Euclidian Distance"
-                    }
-                  />
-                ))}
+                {results[metric].similar.map(([slug, score]) => {
+                  const textItem = texts.find((item) => item.slug === slug);
+                  return (
+                    <ResultInstance
+                      score={score}
+                      title={textItem?.title}
+                      text={textItem?.text}
+                      scoreLabel={
+                        metric === "cosine_similarities"
+                          ? "Cosine Similarity"
+                          : "Euclidian Distance"
+                      }
+                      viewFullText={openModalWrapper}
+                    />
+                  );
+                })}
               </Box>
             </Box>
           )}
+          <ViewFullTextModal
+            text={textData.text}
+            title={textData.title}
+            isOpen={modalIsOpen}
+            onClose={closeModalWrapper}
+          />
         </>
       )}
     </Box>

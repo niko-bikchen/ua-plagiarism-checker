@@ -7,6 +7,8 @@ import Box from "@mui/material/Box";
 
 import Header from "./components/Header";
 import MainPage from "./pages/MainPage";
+import Texts from "./pages/Texts";
+import NoMatchPage from "./pages/NoMatch";
 
 const App = () => {
   return (
@@ -16,6 +18,8 @@ const App = () => {
         <TextsProvider>
           <Routes>
             <Route path="/" element={<MainPage />} />
+            <Route path="/texts-list" element={<Texts />} />
+            <Route path="*" element={<NoMatchPage />} />
           </Routes>
         </TextsProvider>
       </Box>

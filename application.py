@@ -5,7 +5,7 @@ import hashlib
 import gdown
 
 from flask_cors import CORS
-from flask import Flask, request, send_from_directory, url_for, make_response
+from flask import Flask, request, send_from_directory, make_response
 from flask_pymongo import PyMongo
 from fastapi.encoders import jsonable_encoder
 

@@ -1,0 +1,17 @@
+.TextLabel {
+    display         : flex;
+    justify-content : flex-start;
+    align-items     : center;
+    width           : -moz-fit-content;
+    width           : fit-content;
+    padding         : 5px 10px;
+    color           : white;
+    background-color: #1976d2;
+    border-radius   : 4px;
+}
+
+.TextBlock {
+    padding      : 16.5px 14px;
+    border-radius: 4px;
+    border       : 1px solid #dadada;
+}
