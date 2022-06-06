@@ -5,7 +5,7 @@ import uuid
 
 import gdown
 
-from flask_cors import CORS
+# from flask_cors import CORS
 from flask import Flask, request, send_from_directory, make_response
 from flask_pymongo import PyMongo
 from fastapi.encoders import jsonable_encoder
@@ -49,7 +49,7 @@ print(f"{datetime.utcnow()}: Setting-up Flask & PyMongo")
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
-CORS(app)
+# CORS(app)
 
 pymongo = PyMongo(app)
 
