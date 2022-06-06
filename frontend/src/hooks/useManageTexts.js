@@ -8,7 +8,8 @@ const useTexts = () => {
     setIsProcessing(true);
     axios
       .post("/texts/", {
-        text: newText,
+        text: newText.text,
+        title: newText.title,
       })
       .then(() => axios.get("/texts/"))
       .then((res) => setTexts([...res.data.texts]))

@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import hashlib
+import uuid
 
 import gdown
 
@@ -116,7 +117,7 @@ def new_text():
     raw_text = request.get_json()
     raw_text["date_added"] = datetime.utcnow()
     raw_text["slug"] = hashlib.sha256(
-        (str(raw_text['text']) + str(raw_text['title'])).encode('utf-8')).hexdigest()
+        (str(raw_text['text']) + str(raw_text['title']) + str(uuid.uuid4())).encode('utf-8')).hexdigest()
 
     text = UaText(**raw_text)
     insert_result = ua_texts_collection.insert_one(text.to_bson())

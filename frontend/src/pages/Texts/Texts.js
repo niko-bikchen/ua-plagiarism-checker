@@ -21,6 +21,7 @@ import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 
 import ViewFullTextModal from "../../components/ViewFullTextModal";
 import DeleteTextModal from "./components/DeleteTextModal";
+import AddTextModal from "./components/AddTextModal/AddTextModal";
 
 const TEXT_LEN_LIMIT = 500;
 
@@ -58,6 +59,11 @@ const Texts = () => {
     modalIsOpen: deleteModalIsOpen,
     openModal: openDeleteModal,
     closeModal: closeDeleteModal,
+  } = useModalState();
+  const {
+    modalIsOpen: addModalIsOpen,
+    openModal: openAddModal,
+    closeModal: closeAddModal,
   } = useModalState();
   const { isProcessing, addText, deleteText } = useManageTexts();
   const [textData, setTextData] = useState({ title: "", text: "", slug: "" });
@@ -115,11 +121,20 @@ const Texts = () => {
       gap={2}
       width="100%"
     >
-      <Box className="TextAreaLabel">
-        <Typography variant="subtitle1" marginRight="5px">
-          Available Texts
-        </Typography>
-        <TextSnippetIcon />
+      <Box display="flex" justifyContent="space-between">
+        <Box className="TextAreaLabel">
+          <Typography variant="subtitle1" marginRight="5px">
+            Available Texts
+          </Typography>
+          <TextSnippetIcon />
+        </Box>
+        <Button
+          variant="contained"
+          onClick={openAddModal}
+          disabled={fetchingTexts || isProcessing}
+        >
+          Add Text
+        </Button>
       </Box>
       {fetchingTexts || isProcessing ? (
         <Stack direction="column" gap={2}>
@@ -150,6 +165,12 @@ const Texts = () => {
         isOpen={deleteModalIsOpen}
         onClose={closeDeleteModalWrapper}
         onDelete={onTextDelete(textData.slug)}
+      />
+      <AddTextModal
+        isOpen={addModalIsOpen}
+        onClose={closeAddModal}
+        onAdd={addText}
+        onTextsChange={onTextsChange}
       />
     </Box>
   );

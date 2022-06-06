@@ -33,7 +33,9 @@ const ResultInstance = ({ title, text, score, scoreLabel, viewFullText }) => (
       {title}
     </Typography>
     <Typography>
-      {text.length > TEXT_LEN_LIMIT ? text.substring(0, TEXT_LEN_LIMIT) : text}
+      {text?.length > TEXT_LEN_LIMIT
+        ? text?.substring(0, TEXT_LEN_LIMIT)
+        : text}
       ...
       <Button variant="text" onClick={viewFullText(title, text)}>
         See Full
