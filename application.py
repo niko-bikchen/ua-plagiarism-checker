@@ -75,14 +75,18 @@ def get_index(path):
 
 @app.route('/compare/', methods=["POST"])
 def compare_texts():
+    # Extract data from the request
     raw_data = request.get_json()
     query_text = str(raw_data['text'])
     model = str(raw_data['model'])
 
+    # Extract all documents from the DB
     cursor = ua_texts_collection.find({}).sort("title")
     documents = [UaText(**doc) for doc in cursor]
 
+    # List of texts
     texts = [query_text] + [doc.text for doc in documents]
+    # List of slugs
     slugs = [query_text] + [doc.slug for doc in documents]
 
     document_embeddings = []
