@@ -47,7 +47,7 @@ sbert_model = SentenceTransformer(
 print(f"{datetime.utcnow()}: Setting-up Flask & PyMongo")
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+app.config["MONGO_URI"] = 'mongodb+srv://niko:adminnikolay19@maincluster.pjgnm.mongodb.net/?retryWrites=true&w=majority'
 
 # CORS(app)
 
